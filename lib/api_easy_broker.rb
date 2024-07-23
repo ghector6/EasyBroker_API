@@ -5,8 +5,11 @@ api_url=ENV['API_URL']
 api_token=ENV['API_TOKEN']
 class ApiEasyBroker 
   def self.get(url, token)
-    response = RestClient.get(url, {'X-Authorization': token})
-    JSON.parse(response)
+    response = RestClient.get(url, {
+        'X-Authorization': token,
+        'Country-Code': 'MX',
+        'accept': 'application/json'
+      })
     response.code
   end
 end
