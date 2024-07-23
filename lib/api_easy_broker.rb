@@ -2,28 +2,28 @@ require 'rest-client'
 require 'json'
 require 'dotenv/load'
 
-api_url = ENV['API_URL']
-api_token = ENV['API_TOKEN']
-
 class ApiEasyBroker
-  def self.get(url, token)
-    response = RestClient.get(url, {
-      'X-Authorization': token,
-      'Country-Code': 'MX',
-      'accept': 'application/json'
-    })
-    JSON.parse(response)
-    response.code
+  @api_url = ENV['API_URL']
+  @api_token = ENV['API_TOKEN']
+  @headers = {
+    'X-Authorization': @api_token,
+    'Country-Code': 'MX',
+    'Accept': 'application/json'
+  }
+
+  def self.get(endpoint)
+    response = RestClient.get("#{@api_url}#{endpoint}", @headers)
+    JSON.parse(response.body)
+  rescue RestClient::ExceptionWithResponse => e
+    puts "An error occurred: #{e.response}"
+    nil
   end
 
   def self.get_titles
-    response = RestClient.get("#{ENV['API_URL']}", {
-      'X-Authorization': ENV['API_TOKEN'],
-      'Country-Code': 'MX',
-      'Accept': 'application/json'
-    })
-    json_response = JSON.parse(response.body)
-    json_response['content'].map { |property| property['title'] } 
+    response = get("/properties")
+    return [] if response.nil?
+
+    response['content'].map { |property| property['title'] }
   rescue => e
     puts "An error occurred: #{e.message}"
     []
@@ -31,5 +31,10 @@ class ApiEasyBroker
 end
 
 if __FILE__ == $0
-  puts ApiEasyBroker.get_titles
+  titles = ApiEasyBroker.get_titles
+  if titles.empty?
+    puts "No titles found or an error occurred."
+  else
+    puts titles
+  end
 end
