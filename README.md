@@ -1,0 +1,2 @@
+# EasyBroker_API
+.env
