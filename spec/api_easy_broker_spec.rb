@@ -8,4 +8,11 @@ RSpec.describe ApiEasyBroker do
       response = ApiEasyBroker.get(api_url, api_token)
       expect(response).to eq(200)
   end
+
+  it 'should return a list of 50 titles' do
+    titles = ApiEasyBroker.get_titles
+    expect(titles).to be_an(Array)
+    expect(titles.size).to be > 0
+  end
+
 end
